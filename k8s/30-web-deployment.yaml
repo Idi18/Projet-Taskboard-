@@ -1,0 +1,71 @@
+# Deployment de l'application web : 2 réplicas sans état (K8S-2)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: taskboard
+  labels:
+    app: taskboard
+    tier: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: taskboard
+      tier: web
+  # Mise à jour sans coupure : on ajoute un Pod avant d'en retirer un (T9)
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: taskboard
+        tier: web
+    spec:
+      containers:
+        - name: web
+          image: taskboard-web:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+          # Configuration non sensible depuis la ConfigMap (K8S-3)
+          envFrom:
+            - configMapRef:
+                name: web-config
+          # Mot de passe depuis le Secret (K8S-3)
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DB_PASSWORD
+          # Ressources (K8S-5)
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          # Sondes de santé (K8S-4)
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          # Sécurité (SEC-2)
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
