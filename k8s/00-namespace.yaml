@@ -1,0 +1,7 @@
+# Namespace dédié : tous les objets du projet sont créés dedans (K8S-1)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: taskboard
+  labels:
+    app: taskboard
