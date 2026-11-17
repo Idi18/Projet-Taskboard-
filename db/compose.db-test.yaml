@@ -1,0 +1,27 @@
+# Configuration de test indépendante de PostgreSQL
+# Ne remplace pas le compose.yaml principal du projet.
+
+services:
+  db:
+    image: postgres:16-alpine
+
+    environment:
+      POSTGRES_DB: taskboard
+      POSTGRES_USER: taskboard
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Variable requise}
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  db-data:
