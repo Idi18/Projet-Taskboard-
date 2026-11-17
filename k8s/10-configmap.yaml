@@ -1,0 +1,19 @@
+# Configuration non sensible de TaskBoard
+# Exigences DB-3 et K8S-3
+
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: web-config
+  namespace: taskboard
+  labels:
+    app: taskboard
+    tier: web
+
+data:
+  DB_HOST: "db"
+  DB_PORT: "5432"
+  DB_NAME: "taskboard"
+  DB_USER: "taskboard"
+  APP_PORT: "3000"
