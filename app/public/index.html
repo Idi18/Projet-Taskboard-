@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskBoard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>TaskBoard</h1>
+    <!-- APP-6 -->
+    <p class="pod">Servi par le Pod <strong id="pod-name">{{POD_NAME}}</strong> · version <span id="version">{{VERSION}}</span></p>
+  </header>
+
+  <main>
+    <form id="new-task">
+      <label for="titre" class="sr-only">Nouvelle tâche</label>
+      <input id="titre" name="titre" type="text" maxlength="255" placeholder="Nouvelle tâche…" required autocomplete="off">
+      <button type="submit">Ajouter</button>
+    </form>
+
+    <p id="message" role="status"></p>
+
+    <ul id="tasks"></ul>
+    <p id="empty" hidden>Aucune tâche pour le moment.</p>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
