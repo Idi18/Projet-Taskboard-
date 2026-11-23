@@ -6,6 +6,7 @@ const empty = document.getElementById("empty");
 const form = document.getElementById("new-task");
 const input = document.getElementById("titre");
 const message = document.getElementById("message");
+const counter = document.getElementById("counter");
 
 function showMessage(text, isError = false) {
   message.textContent = text;
@@ -61,6 +62,8 @@ async function loadTasks() {
     const tasks = await api("GET", "/api/tasks");
     list.replaceChildren(...tasks.map(renderTask));
     empty.hidden = tasks.length > 0;
+    const restantes = tasks.filter((t) => !t.terminee).length;
+    counter.textContent = `${restantes} tâche${restantes > 1 ? "s" : ""} restante${restantes > 1 ? "s" : ""} sur ${tasks.length}`;
   } catch (err) {
     showMessage(`Impossible de charger les tâches : ${err.message}`, true);
   }

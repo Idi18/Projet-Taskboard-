@@ -1,5 +1,5 @@
 :root {
-  --accent: #2563eb;
+  --accent: #059669;
   --bg: #f4f6fb;
   --card: #ffffff;
   --text: #1f2937;
@@ -58,6 +58,8 @@ button.delete {
   font-size: .85rem;
   padding: .3rem .5rem;
 }
+
+.counter { margin: 1rem 0 .5rem; font-weight: 600; }
 
 #message { min-height: 1.2rem; color: var(--muted); }
 #message.error { color: var(--danger); }
