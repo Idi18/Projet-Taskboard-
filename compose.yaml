@@ -1,0 +1,51 @@
+# Lancement en local : app + base (DOC-6)
+# cp .env.example .env  puis  docker compose up --build
+# Base reprise de db/compose.db-test.yaml
+
+name: taskboard
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: taskboard
+      POSTGRES_USER: taskboard
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Définir DB_PASSWORD dans le fichier .env}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    # pas de ports : la base n'est pas exposee
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build: ./app
+    image: taskboard-web:1.0.0
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: taskboard
+      DB_USER: taskboard
+      DB_PASSWORD: ${DB_PASSWORD:?Définir DB_PASSWORD dans le fichier .env}
+      APP_PORT: "3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:3000/readyz"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  db-data:
